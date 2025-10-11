@@ -1,3 +1,4 @@
+
 local SimpleTabGui = {}
 SimpleTabGui.__index = SimpleTabGui
 SimpleTabGui.Version = "1.0.0"
@@ -466,7 +467,13 @@ function SimpleTabGui:AddDropdown(id, options)
     dropdown.SetValue = function(value)
         if options.Multi then
             dropdown.Value = value
-            dropdownButton.Text = table.concat({k for k, v in pairs(value) if v}, ", ")
+            local selected = {}
+            for k, v in pairs(value) do
+                if v then
+                    table.insert(selected, k)
+                end
+            end
+            dropdownButton.Text = table.concat(selected, ", ") or "None"
         else
             dropdown.Value = value
             dropdownButton.Text = tostring(value)
@@ -479,7 +486,7 @@ function SimpleTabGui:AddDropdown(id, options)
     dropdownButton.MouseButton1Click:Connect(function()
         local dropdownFrame = createElement("Frame", {
             Parent = self.ScreenGui,
-            Size = UDim2.new(0, 200, 0, 100),
+            Size = UDim2.new(0, 200, 0, math.min(#options.Values * 20 + 10, 100)),
             Position = UDim2.new(0, dropdownButton.AbsolutePosition.X, 0, dropdownButton.AbsolutePosition.Y + 30),
             BackgroundColor3 = Color3.fromRGB(40, 40, 40),
             BorderSizePixel = 0
@@ -531,3 +538,169 @@ function SimpleTabGui:AddDropdown(id, options)
 end
 
 return SimpleTabGui
+```
+
+#### Исправления в коде:
+- **Метод `AddDropdown`**:
+  - Исправлена строка `dropdownButton.Text = table.concat({k for k, v in pairs(value) if v}, ", ")`. Теперь используется правильный Lua-код:
+    ```lua
+    local selected = {}
+    for k, v in pairs(value) do
+        if v then
+            table.insert(selected, k)
+        end
+    end
+    dropdownButton.Text = table.concat(selected, ", ") or "None"
+    ```
+    Это собирает выбранные значения из таблицы `value` (для многоэлементного выпадающего списка) и отображает их через запятую.
+- **Размер выпадающего списка**:
+  - Добавлено динамическое вычисление высоты фрейма выпадающего списка: `math.min(#options.Values * 20 + 10, 100)`, чтобы он не был слишком большим.
+- **Прочее**:
+  - Проверены все методы (`CreateWindow`, `AddTab`, `AddParagraph`, `AddButton`, `AddToggle`, `AddSlider`) — они синтаксически корректны.
+  - Убедились, что все `}` пары сбалансированы.
+
+---
+
+### Шаг 4: Код для экзекьютора (`LoadGui.lua`)
+
+Этот код загружает библиотеку с GitHub и создаёт GUI, аналогичное Fluent, с вкладками, уведомлениями и элементами управления, как в вашем примере. Вставьте его в экзекьютор (например, Synapse X) или в `LocalScript` в Roblox Studio.
+
+<xaiArtifact artifact_id="f2f3fddc-4e74-43ea-b3a2-1f4cc081f3c0" artifact_version_id="d9c063ec-4671-4eec-9c17-d6ceb1004ed5" title="LoadGui.lua" contentType="text/lua">
+```lua
+local HttpService = game:GetService("HttpService")
+
+-- URL библиотеки на GitHub (замените на ваш)
+local LIBRARY_URL = "https://raw.githubusercontent.com/yourusername/SimpleTabGui/main/SimpleTabGui.lua"
+
+-- Загрузка библиотеки
+local function loadLibrary()
+    local success, result = pcall(function()
+        return HttpService:GetAsync(LIBRARY_URL)
+    end)
+    
+    if success then
+        local func, err = loadstring(result)
+        if func then
+            return func()
+        else
+            warn("Ошибка загрузки библиотеки: " .. tostring(err))
+            return nil
+        end
+    else
+        warn("Ошибка получения библиотеки: " .. tostring(result))
+        return nil
+    end
+end
+
+-- Загружаем библиотеку
+local SimpleTabGui = loadLibrary()
+
+if SimpleTabGui then
+    -- Создаём окно
+    local Window = SimpleTabGui:CreateWindow({
+        Title = "SimpleTabGui " .. SimpleTabGui.Version,
+        SubTitle = "by Grok",
+        TabWidth = 160,
+        Size = UDim2.fromOffset(580, 460)
+    })
+    
+    -- Добавляем вкладки
+    local Tabs = {
+        Main = Window:AddTab({ Title = "Main", Icon = "" }),
+        Settings = Window:AddTab({ Title = "Settings", Icon = "" })
+    }
+    
+    local Options = SimpleTabGui.Options
+    
+    -- Уведомление о загрузке
+    SimpleTabGui:Notify({
+        Title = "SimpleTabGui",
+        Content = "Скрипт загружен!",
+        Duration = 8
+    })
+    
+    -- Добавляем параграф
+    Tabs.Main:AddParagraph({
+        Title = "Параграф",
+        Content = "Это параграф.\nВторая строка!"
+    })
+    
+    -- Добавляем кнопку
+    Tabs.Main:AddButton({
+        Title = "Кнопка",
+        Description = "Очень важная кнопка",
+        Callback = function()
+            print("Кнопка нажата!")
+        end
+    })
+    
+    -- Добавляем переключатель
+    local Toggle = Tabs.Main:AddToggle("MyToggle", {
+        Title = "Переключатель",
+        Default = false,
+        Callback = function(value)
+            print("Переключатель изменён:", value)
+        end
+    })
+    
+    Toggle:SetValue(false)
+    
+    -- Добавляем слайдер
+    local Slider = Tabs.Main:AddSlider("Slider", {
+        Title = "Слайдер",
+        Description = "Это слайдер",
+        Default = 2,
+        Min = 0,
+        Max = 5,
+        Rounding = 1,
+        Callback = function(value)
+            print("Слайдер изменён:", value)
+        end
+    })
+    
+    Slider:SetValue(3)
+    
+    -- Добавляем выпадающий список
+    local Dropdown = Tabs.Main:AddDropdown("Dropdown", {
+        Title = "Выпадающий список",
+        Values = {"один", "два", "три", "четыре", "пять"},
+        Multi = false,
+        Default = "один",
+        Callback = function(value)
+            print("Выпадающий список изменён:", value)
+        end
+    })
+    
+    Dropdown:SetValue("четыре")
+    
+    -- Добавляем многоэлементный выпадающий список
+    local MultiDropdown = Tabs.Main:AddDropdown("MultiDropdown", {
+        Title = "Многоэлементный список",
+        Description = "Можно выбрать несколько значений",
+        Values = {"один", "два", "три", "четыре", "пять"},
+        Multi = true,
+        Default = {["один"] = true, ["три"] = true},
+        Callback = function(value)
+            local selected = {}
+            for k, v in pairs(value) do
+                if v then
+                    table.insert(selected, k)
+                end
+            end
+            print("Многоэлементный список изменён:", table.concat(selected, ", "))
+        end
+    })
+    
+    MultiDropdown:SetValue({
+        два = true,
+        четыре = true,
+        один = false
+    })
+    
+    -- Выбираем первую вкладку
+    Window:SelectTab(1)
+    
+    print("GUI успешно загружено!")
+else
+    warn("Не удалось загрузить библиотеку. Проверьте URL.")
+end
