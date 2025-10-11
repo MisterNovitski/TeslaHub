@@ -1,0 +1,198 @@
+```lua
+local SimpleTabGui = {}
+SimpleTabGui.__index = SimpleTabGui
+
+-- Helper function to create a UI element with common properties
+local function createElement(class, properties)
+    local element = Instance.new(class)
+    for key, value in pairs(properties) do
+        element[key] = value
+    end
+    return element
+end
+
+-- Create a new GUI instance
+function SimpleTabGui.new(title)
+    local self = setmetatable({}, SimpleTabGui)
+    
+    -- Main ScreenGui
+    self.ScreenGui = createElement("ScreenGui", {
+        Name = "SimpleTabGui",
+        Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui"),
+        ResetOnSpawn = false,
+        IgnoreGuiInset = true
+    })
+    
+    -- Main Frame (window)
+    self.MainFrame = createElement("Frame", {
+        Name = "MainFrame",
+        Parent = self.ScreenGui,
+        Size = UDim2.new(0, 600, 0, 400),
+        Position = UDim2.new(0.5, -300, 0.5, -200),
+        BackgroundColor3 = Color3.fromRGB(30, 30, 30),  -- Dark background
+        BorderSizePixel = 0
+    })
+    
+    -- Add rounded corners to main frame
+    local uiCorner = createElement("UICorner", {
+        CornerRadius = UDim.new(0, 8),
+        Parent = self.MainFrame
+    })
+    
+    -- Title bar
+    self.TitleBar = createElement("Frame", {
+        Name = "TitleBar",
+        Parent = self.MainFrame,
+        Size = UDim2.new(1, 0, 0, 40),
+        BackgroundColor3 = Color3.fromRGB(40, 40, 40),
+        BorderSizePixel = 0
+    })
+    
+    local titleCorner = createElement("UICorner", {
+        CornerRadius = UDim.new(0, 8),
+        Parent = self.TitleBar
+    })
+    
+    self.TitleLabel = createElement("TextLabel", {
+        Name = "TitleLabel",
+        Parent = self.TitleBar,
+        Size = UDim2.new(1, -40, 1, 0),
+        Position = UDim2.new(0, 10, 0, 0),
+        BackgroundTransparency = 1,
+        Text = title or "Simple Tab GUI",
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        TextSize = 18,
+        Font = Enum.Font.GothamBold,
+        TextXAlignment = Enum.TextXAlignment.Left
+    })
+    
+    -- Close button
+    self.CloseButton = createElement("TextButton", {
+        Name = "CloseButton",
+        Parent = self.TitleBar,
+        Size = UDim2.new(0, 30, 0, 30),
+        Position = UDim2.new(1, -35, 0.5, -15),
+        BackgroundColor3 = Color3.fromRGB(255, 50, 50),
+        Text = "X",
+        TextColor3 = Color3.fromRGB(255, 255, 255),
+        Font = Enum.Font.Gotham,
+        TextSize = 14
+    })
+    
+    local closeCorner = createElement("UICorner", {
+        CornerRadius = UDim.new(0, 4),
+        Parent = self.CloseButton
+    })
+    
+    self.CloseButton.MouseButton1Click:Connect(function()
+        self.ScreenGui:Destroy()
+    end)
+    
+    -- Tab container (for tab buttons)
+    self.TabContainer = createElement("Frame", {
+        Name = "TabContainer",
+        Parent = self.MainFrame,
+        Size = UDim2.new(1, 0, 0, 40),
+        Position = UDim2.new(0, 0, 0, 40),
+        BackgroundColor3 = Color3.fromRGB(35, 35, 35),
+        BorderSizePixel = 0
+    })
+    
+    local tabList = createElement("UIListLayout", {
+        Parent = self.TabContainer,
+        FillDirection = Enum.FillDirection.Horizontal,
+        SortOrder = Enum.SortOrder.LayoutOrder,
+        Padding = UDim.new(0, 5)
+    })
+    
+    -- Content area
+    self.ContentFrame = createElement("Frame", {
+        Name = "ContentFrame",
+        Parent = self.MainFrame,
+        Size = UDim2.new(1, 0, 1, -80),
+        Position = UDim2.new(0, 0, 0, 80),
+        BackgroundTransparency = 1
+    })
+    
+    -- Tab tracking
+    self.Tabs = {}
+    self.ActiveTab = nil
+    
+    return self
+end
+
+-- Add a new tab
+function SimpleTabGui:addTab(name)
+    local tab = {}
+    
+    -- Tab button
+    tab.Button = createElement("TextButton", {
+        Name = name .. "Button",
+        Parent = self.TabContainer,
+        Size = UDim2.new(0, 100, 1, 0),
+        BackgroundColor3 = Color3.fromRGB(50, 50, 50),
+        Text = name,
+        TextColor3 = Color3.fromRGB(200, 200, 200),
+        Font = Enum.Font.Gotham,
+        TextSize = 14,
+        AutoButtonColor = false
+    })
+    
+    local buttonCorner = createElement("UICorner", {
+        CornerRadius = UDim.new(0, 4),
+        Parent = tab.Button
+    })
+    
+    -- Tab content frame
+    tab.Content = createElement("ScrollingFrame", {
+        Name = name .. "Content",
+        Parent = self.ContentFrame,
+        Size = UDim2.new(1, 0, 1, 0),
+        BackgroundColor3 = Color3.fromRGB(30, 30, 30),
+        BorderSizePixel = 0,
+        CanvasSize = UDim2.new(0, 0, 0, 0),  -- Auto-size later if needed
+        ScrollBarThickness = 6,
+        Visible = false
+    })
+    
+    local contentCorner = createElement("UICorner", {
+        CornerRadius = UDim.new(0, 8),
+        Parent = tab.Content
+    })
+    
+    local contentPadding = createElement("UIPadding", {
+        Parent = tab.Content,
+        PaddingTop = UDim.new(0, 10),
+        PaddingBottom = UDim.new(0, 10),
+        PaddingLeft = UDim.new(0, 10),
+        PaddingRight = UDim.new(0, 10)
+    })
+    
+    -- Activate tab function
+    local function activate()
+        if self.ActiveTab then
+            self.ActiveTab.Button.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            self.ActiveTab.Button.TextColor3 = Color3.fromRGB(200, 200, 200)
+            self.ActiveTab.Content.Visible = false
+        end
+        tab.Button.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+        tab.Button.TextColor3 = Color3.fromRGB(255, 255, 255)
+        tab.Content.Visible = true
+        self.ActiveTab = tab
+    end
+    
+    tab.Button.MouseButton1Click:Connect(activate)
+    
+    table.insert(self.Tabs, tab)
+    
+    -- Activate first tab by default
+    if #self.Tabs == 1 then
+        activate()
+    end
+    
+    -- Return the tab object so user can add elements to tab.Content
+    return tab
+end
+
+return SimpleTabGui
+```
