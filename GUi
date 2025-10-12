@@ -278,17 +278,24 @@ function ModernUI:CreateWindow(options)
             UICorner.CornerRadius = UDim.new(0, 4)
             UICorner.Parent = toggle
             
-            local toggleButton = Instance.new("TextButton")
-            toggleButton.Size = UDim2.new(0, 40, 0, 20)
-            toggleButton.Position = UDim2.new(1, -45, 0.5, -10)
+            local toggleContainer = Instance.new("Frame")
+            toggleContainer.Size = UDim2.new(0, 50, 0, 24)
+            toggleContainer.Position = UDim2.new(1, -55, 0.5, -12)
+            toggleContainer.AnchorPoint = Vector2.new(0, 0.5)
+            toggleContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Hover
+            toggleContainer.BorderSizePixel = 0
+            toggleContainer.Parent = toggle
+            
+            local toggleButton = Instance.new("Frame")
+            toggleButton.Size = UDim2.new(0, 20, 0, 20)
+            toggleButton.Position = UDim2.new(0, 2, 0.5, -10)
             toggleButton.AnchorPoint = Vector2.new(0, 0.5)
-            toggleButton.BackgroundColor3 = options.Default and ModernUI.Themes[window.Theme].Primary or ModernUI.Themes[window.Theme].Hover
+            toggleButton.BackgroundColor3 = ModernUI.Themes[window.Theme].Text
             toggleButton.BorderSizePixel = 0
-            toggleButton.Text = ""
-            toggleButton.Parent = toggle
+            toggleButton.Parent = toggleContainer
             
             local toggleLabel = Instance.new("TextLabel")
-            toggleLabel.Size = UDim2.new(1, -50, 1, 0)
+            toggleLabel.Size = UDim2.new(1, -60, 1, 0)
             toggleLabel.Position = UDim2.new(0, 10, 0, 0)
             toggleLabel.BackgroundTransparency = 1
             toggleLabel.Text = toggleName
@@ -298,11 +305,54 @@ function ModernUI:CreateWindow(options)
             toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
             toggleLabel.Parent = toggle
             
+            -- Закругления для контейнера и кнопки
+            local UICornerContainer = Instance.new("UICorner")
+            UICornerContainer.CornerRadius = UDim.new(0, 12)
+            UICornerContainer.Parent = toggleContainer
+            
             local UICornerToggle = Instance.new("UICorner")
             UICornerToggle.CornerRadius = UDim.new(0, 10)
             UICornerToggle.Parent = toggleButton
             
             local state = options.Default or false
+            
+            -- Функция для обновления внешнего вида toggle
+            local function updateToggleAppearance()
+                if state then
+                    -- Включено - синий фон, кружок справа
+                    game:GetService("TweenService"):Create(
+                        toggleContainer,
+                        TweenInfo.new(0.2),
+                        {BackgroundColor3 = ModernUI.Themes[window.Theme].Primary}
+                    ):Play()
+                    game:GetService("TweenService"):Create(
+                        toggleButton,
+                        TweenInfo.new(0.2),
+                        {
+                            Position = UDim2.new(1, -22, 0.5, -10),
+                            BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+                        }
+                    ):Play()
+                else
+                    -- Выключено - серый фон, кружок слева
+                    game:GetService("TweenService"):Create(
+                        toggleContainer,
+                        TweenInfo.new(0.2),
+                        {BackgroundColor3 = ModernUI.Themes[window.Theme].Hover}
+                    ):Play()
+                    game:GetService("TweenService"):Create(
+                        toggleButton,
+                        TweenInfo.new(0.2),
+                        {
+                            Position = UDim2.new(0, 2, 0.5, -10),
+                            BackgroundColor3 = ModernUI.Themes[window.Theme].Text
+                        }
+                    ):Play()
+                end
+            end
+            
+            -- Устанавливаем начальное состояние
+            updateToggleAppearance()
             
             -- Description
             if options.Description then
@@ -318,16 +368,19 @@ function ModernUI:CreateWindow(options)
                 desc.Parent = toggle
             end
             
+            -- Клик по всему контейнеру toggle
+            local clickArea = Instance.new("TextButton")
+            clickArea.Size = UDim2.new(1, 0, 1, 0)
+            clickArea.BackgroundTransparency = 1
+            clickArea.Text = ""
+            clickArea.Parent = toggle
+            
             local toggleObj = {
                 Value = state,
                 OnChanged = function(callback)
-                    toggleButton.MouseButton1Click:Connect(function()
+                    clickArea.MouseButton1Click:Connect(function()
                         state = not state
-                        game:GetService("TweenService"):Create(
-                            toggleButton, 
-                            TweenInfo.new(0.2), 
-                            {BackgroundColor3 = state and ModernUI.Themes[window.Theme].Primary or ModernUI.Themes[window.Theme].Hover}
-                        ):Play()
+                        updateToggleAppearance()
                         
                         if callback then
                             callback(state)
@@ -336,7 +389,7 @@ function ModernUI:CreateWindow(options)
                 end,
                 SetValue = function(newValue)
                     state = newValue
-                    toggleButton.BackgroundColor3 = state and ModernUI.Themes[window.Theme].Primary or ModernUI.Themes[window.Theme].Hover
+                    updateToggleAppearance()
                 end
             }
             
