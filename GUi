@@ -1,18 +1,15 @@
--- ModernUI.lua
--- Cleaned, simplified, Dark/Light themes only
--- Author: Modernized by ChatGPT
+-- TeslaHub Modern GUI
+-- Clean, draggable, with theme selector and close button
 
 local ModernUI = {}
 ModernUI.__index = ModernUI
 
--- ✅ Две темы: Dark и Light
 ModernUI.Themes = {
     Dark = {
         Primary = Color3.fromRGB(0, 120, 215),
         Secondary = Color3.fromRGB(40, 40, 40),
         Background = Color3.fromRGB(25, 25, 25),
         Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(60, 60, 60),
         Hover = Color3.fromRGB(55, 55, 55),
         Accent = Color3.fromRGB(0, 120, 215)
     },
@@ -21,7 +18,6 @@ ModernUI.Themes = {
         Secondary = Color3.fromRGB(240, 240, 240),
         Background = Color3.fromRGB(255, 255, 255),
         Text = Color3.fromRGB(0, 0, 0),
-        Border = Color3.fromRGB(200, 200, 200),
         Hover = Color3.fromRGB(225, 225, 225),
         Accent = Color3.fromRGB(0, 120, 215)
     }
@@ -29,221 +25,212 @@ ModernUI.Themes = {
 
 -- 🪟 Создание окна
 function ModernUI:CreateWindow(options)
-    local window = setmetatable({}, ModernUI)
-    window.Title = options.Title or "Modern UI"
-    window.Size = options.Size or UDim2.new(0, 500, 0, 400)
-    window.Theme = options.Theme or "Dark"
-    window.Transparency = options.Transparency or 0
-    window.Options = {}
+    local self = setmetatable({}, ModernUI)
+    self.Title = options.Title or "Tesla Hub"
+    self.Size = options.Size or UDim2.new(0, 500, 0, 400)
+    self.Theme = options.Theme or "Dark"
+    self.Transparency = options.Transparency or 0
+    self.Options = {}
 
-    -- Main ScreenGui
-    local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "ModernUI"
-    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+    local player = game.Players.LocalPlayer
+    local gui = Instance.new("ScreenGui")
+    gui.Name = "TeslaHubUI"
+    gui.Parent = player:WaitForChild("PlayerGui")
 
-    local mainFrame = Instance.new("Frame")
-    mainFrame.Size = window.Size
-    mainFrame.Position = UDim2.new(0.5, -window.Size.X.Offset / 2, 0.5, -window.Size.Y.Offset / 2)
-    mainFrame.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-    mainFrame.BorderSizePixel = 0
-    mainFrame.Parent = screenGui
+    local main = Instance.new("Frame")
+    main.Size = self.Size
+    main.Position = UDim2.new(0.5, -self.Size.X.Offset / 2, 0.5, -self.Size.Y.Offset / 2)
+    main.BackgroundColor3 = ModernUI.Themes[self.Theme].Background
+    main.BorderSizePixel = 0
+    main.Parent = gui
 
     local corner = Instance.new("UICorner")
     corner.CornerRadius = UDim.new(0, 8)
-    corner.Parent = mainFrame
+    corner.Parent = main
 
-    local titleBar = Instance.new("TextLabel")
-    titleBar.Size = UDim2.new(1, 0, 0, 30)
-    titleBar.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
-    titleBar.Text = window.Title
-    titleBar.TextColor3 = ModernUI.Themes[window.Theme].Text
-    titleBar.TextSize = 16
-    titleBar.Font = Enum.Font.GothamBold
-    titleBar.Parent = mainFrame
+    -- 🧭 Заголовок
+    local titleBar = Instance.new("Frame")
+    titleBar.Size = UDim2.new(1, 0, 0, 35)
+    titleBar.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
+    titleBar.BorderSizePixel = 0
+    titleBar.Parent = main
 
-    window.MainFrame = mainFrame
-    window.ScreenGui = screenGui
-    window.Tabs = {}
+    local titleLabel = Instance.new("TextLabel")
+    titleLabel.Size = UDim2.new(1, -40, 1, 0)
+    titleLabel.Position = UDim2.new(0, 10, 0, 0)
+    titleLabel.BackgroundTransparency = 1
+    titleLabel.Text = self.Title
+    titleLabel.TextColor3 = ModernUI.Themes[self.Theme].Text
+    titleLabel.Font = Enum.Font.GothamBold
+    titleLabel.TextSize = 16
+    titleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    titleLabel.Parent = titleBar
 
-    return window
-end
+    -- ❌ Кнопка закрытия
+    local closeButton = Instance.new("TextButton")
+    closeButton.Size = UDim2.new(0, 30, 0, 30)
+    closeButton.Position = UDim2.new(1, -35, 0.5, 0)
+    closeButton.AnchorPoint = Vector2.new(0, 0.5)
+    closeButton.BackgroundColor3 = ModernUI.Themes[self.Theme].Primary
+    closeButton.Text = "X"
+    closeButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    closeButton.Font = Enum.Font.GothamBold
+    closeButton.TextSize = 14
+    closeButton.Parent = titleBar
 
--- 🧭 Добавление вкладки
-function ModernUI:CreateTab(name)
-    local tab = {}
-    tab.Name = name
-    tab.Elements = {}
+    local closeCorner = Instance.new("UICorner")
+    closeCorner.CornerRadius = UDim.new(1, 0)
+    closeCorner.Parent = closeButton
 
+    closeButton.MouseButton1Click:Connect(function()
+        gui:Destroy()
+    end)
+
+    -- 📦 Содержимое
     local content = Instance.new("Frame")
-    content.Size = UDim2.new(1, -20, 1, -40)
-    content.Position = UDim2.new(0, 10, 0, 35)
+    content.Size = UDim2.new(1, -20, 1, -50)
+    content.Position = UDim2.new(0, 10, 0, 45)
     content.BackgroundTransparency = 1
-    content.Parent = self.MainFrame
+    content.Parent = main
+    self.Content = content
 
-    tab.Content = content
-    table.insert(self.Tabs, tab)
-    return tab
+    -- 🖱 Перетаскивание GUI
+    local dragging = false
+    local dragStart, startPos
+
+    titleBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = main.Position
+        end
+    end)
+
+    titleBar.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            if dragging then
+                local delta = input.Position - dragStart
+                main.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+            end
+        end
+    end)
+
+    titleBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+
+    self.MainFrame = main
+    self.GUI = gui
+    return self
 end
 
--- 🕹 Переключатель (Toggle)
+-- 🕹 Toggle
 function ModernUI:AddToggle(options)
-    local toggleName = options.Title or "Toggle"
-    local toggle = Instance.new("Frame")
-    toggle.Size = UDim2.new(1, 0, 0, 35)
-    toggle.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
-    toggle.BackgroundTransparency = self.Transparency
-    toggle.BorderSizePixel = 0
-    toggle.Parent = self.Content
+    local name = options.Title or "Toggle"
+    local callback = options.Callback or function() end
 
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 4)
-    UICorner.Parent = toggle
+    local toggleFrame = Instance.new("Frame")
+    toggleFrame.Size = UDim2.new(1, 0, 0, 35)
+    toggleFrame.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
+    toggleFrame.Parent = self.Content
 
-    local toggleContainer = Instance.new("Frame")
-    toggleContainer.Size = UDim2.new(0, 46, 0, 22)
-    toggleContainer.Position = UDim2.new(1, -60, 0.5, 0)
-    toggleContainer.AnchorPoint = Vector2.new(0, 0.5)
-    toggleContainer.BackgroundColor3 = ModernUI.Themes[self.Theme].Hover
-    toggleContainer.BorderSizePixel = 0
-    toggleContainer.Parent = toggle
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 4)
+    corner.Parent = toggleFrame
 
-    local UICornerContainer = Instance.new("UICorner")
-    UICornerContainer.CornerRadius = UDim.new(1, 0)
-    UICornerContainer.Parent = toggleContainer
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, -70, 1, 0)
+    label.Position = UDim2.new(0, 10, 0, 0)
+    label.BackgroundTransparency = 1
+    label.Text = name
+    label.TextColor3 = ModernUI.Themes[self.Theme].Text
+    label.TextSize = 14
+    label.Font = Enum.Font.Gotham
+    label.TextXAlignment = Enum.TextXAlignment.Left
+    label.Parent = toggleFrame
 
-    local toggleButton = Instance.new("Frame")
-    toggleButton.Size = UDim2.new(0, 18, 0, 18)
-    toggleButton.Position = UDim2.new(0, 3, 0.5, 0)
-    toggleButton.AnchorPoint = Vector2.new(0, 0.5)
-    toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-    toggleButton.BorderSizePixel = 0
-    toggleButton.Parent = toggleContainer
+    local toggleBtn = Instance.new("TextButton")
+    toggleBtn.Size = UDim2.new(0, 40, 0, 20)
+    toggleBtn.Position = UDim2.new(1, -50, 0.5, 0)
+    toggleBtn.AnchorPoint = Vector2.new(0, 0.5)
+    toggleBtn.BackgroundColor3 = ModernUI.Themes[self.Theme].Hover
+    toggleBtn.BorderSizePixel = 0
+    toggleBtn.Text = ""
+    toggleBtn.Parent = toggleFrame
 
-    local UICornerToggle = Instance.new("UICorner")
-    UICornerToggle.CornerRadius = UDim.new(1, 0)
-    UICornerToggle.Parent = toggleButton
+    local round = Instance.new("UICorner")
+    round.CornerRadius = UDim.new(1, 0)
+    round.Parent = toggleBtn
 
-    local toggleLabel = Instance.new("TextLabel")
-    toggleLabel.Size = UDim2.new(1, -70, 1, 0)
-    toggleLabel.Position = UDim2.new(0, 10, 0, 0)
-    toggleLabel.BackgroundTransparency = 1
-    toggleLabel.Text = toggleName
-    toggleLabel.TextColor3 = ModernUI.Themes[self.Theme].Text
-    toggleLabel.TextSize = 14
-    toggleLabel.Font = Enum.Font.Gotham
-    toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    toggleLabel.Parent = toggle
+    local circle = Instance.new("Frame")
+    circle.Size = UDim2.new(0, 16, 0, 16)
+    circle.Position = UDim2.new(0, 2, 0.5, 0)
+    circle.AnchorPoint = Vector2.new(0, 0.5)
+    circle.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    circle.Parent = toggleBtn
 
-    local state = options.Default or false
+    local ccorner = Instance.new("UICorner")
+    ccorner.CornerRadius = UDim.new(1, 0)
+    ccorner.Parent = circle
 
-    local function updateToggleAppearance()
+    local state = false
+    local tween = game:GetService("TweenService")
+
+    local function update()
         if state then
-            game:GetService("TweenService"):Create(toggleContainer, TweenInfo.new(0.2), {
-                BackgroundColor3 = ModernUI.Themes[self.Theme].Primary
-            }):Play()
-            game:GetService("TweenService"):Create(toggleButton, TweenInfo.new(0.2), {
-                Position = UDim2.new(1, -21, 0.5, 0)
-            }):Play()
+            tween:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[self.Theme].Primary}):Play()
+            tween:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(1, -18, 0.5, 0)}):Play()
         else
-            game:GetService("TweenService"):Create(toggleContainer, TweenInfo.new(0.2), {
-                BackgroundColor3 = ModernUI.Themes[self.Theme].Hover
-            }):Play()
-            game:GetService("TweenService"):Create(toggleButton, TweenInfo.new(0.2), {
-                Position = UDim2.new(0, 3, 0.5, 0)
-            }):Play()
+            tween:Create(toggleBtn, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[self.Theme].Hover}):Play()
+            tween:Create(circle, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, 0)}):Play()
         end
     end
 
-    updateToggleAppearance()
+    toggleBtn.MouseButton1Click:Connect(function()
+        state = not state
+        update()
+        callback(state)
+    end)
 
-    local clickArea = Instance.new("TextButton")
-    clickArea.Size = UDim2.new(1, 0, 1, 0)
-    clickArea.BackgroundTransparency = 1
-    clickArea.Text = ""
-    clickArea.Parent = toggle
-
-    local toggleObj = {
-        Value = state,
-        OnChanged = function(callback)
-            clickArea.MouseButton1Click:Connect(function()
-                state = not state
-                updateToggleAppearance()
-                if callback then
-                    callback(state)
-                end
-            end)
-        end,
-        SetValue = function(newValue)
-            state = newValue
-            updateToggleAppearance()
-        end
-    }
-
-    self.Options[toggleName] = toggleObj
-    table.insert(self.Elements, toggle)
-    return toggleObj
+    update()
 end
 
--- 🎨 Селектор тем
+-- 🎨 Вкладка выбора темы
 function ModernUI:AddThemeSelector()
-    local selector = Instance.new("Frame")
-    selector.Size = UDim2.new(1, 0, 0, 80)
-    selector.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
-    selector.BackgroundTransparency = self.Transparency
-    selector.BorderSizePixel = 0
-    selector.Parent = self.Content
-
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 4)
-    UICorner.Parent = selector
-
-    local title = Instance.new("TextLabel")
-    title.Size = UDim2.new(1, -10, 0, 20)
-    title.Position = UDim2.new(0, 10, 0, 5)
-    title.BackgroundTransparency = 1
-    title.Text = "Select Theme"
-    title.TextColor3 = ModernUI.Themes[self.Theme].Text
-    title.TextSize = 14
-    title.Font = Enum.Font.GothamBold
-    title.TextXAlignment = Enum.TextXAlignment.Left
-    title.Parent = selector
-
-    local container = Instance.new("Frame")
-    container.Size = UDim2.new(1, -20, 0, 40)
-    container.Position = UDim2.new(0, 10, 0, 30)
-    container.BackgroundTransparency = 1
-    container.Parent = selector
+    local label = Instance.new("TextLabel")
+    label.Size = UDim2.new(1, 0, 0, 30)
+    label.Text = "Select Theme:"
+    label.TextColor3 = ModernUI.Themes[self.Theme].Text
+    label.Font = Enum.Font.GothamBold
+    label.TextSize = 14
+    label.BackgroundTransparency = 1
+    label.Parent = self.Content
 
     local layout = Instance.new("UIListLayout")
-    layout.FillDirection = Enum.FillDirection.Horizontal
-    layout.Padding = UDim.new(0, 10)
-    layout.Parent = container
+    layout.Padding = UDim.new(0, 5)
+    layout.Parent = self.Content
 
-    for _, themeName in ipairs({"Dark", "Light"}) do
+    for _, themeName in pairs({"Dark", "Light"}) do
         local btn = Instance.new("TextButton")
-        btn.Size = UDim2.new(0, 100, 0, 30)
+        btn.Size = UDim2.new(0, 120, 0, 30)
         btn.BackgroundColor3 = ModernUI.Themes[themeName].Primary
-        btn.BackgroundTransparency = 0.2
-        btn.BorderSizePixel = 0
         btn.Text = themeName
         btn.TextColor3 = ModernUI.Themes[themeName].Text
-        btn.TextSize = 12
         btn.Font = Enum.Font.Gotham
-        btn.Parent = container
+        btn.TextSize = 12
+        btn.Parent = self.Content
 
         local corner = Instance.new("UICorner")
-        corner.CornerRadius = UDim.new(0, 4)
+        corner.CornerRadius = UDim.new(0, 6)
         corner.Parent = btn
 
         btn.MouseButton1Click:Connect(function()
             self.Theme = themeName
             self.MainFrame.BackgroundColor3 = ModernUI.Themes[self.Theme].Background
-            title.TextColor3 = ModernUI.Themes[self.Theme].Text
-            btn.BackgroundTransparency = 0
         end)
     end
-
-    return selector
 end
 
 return ModernUI
