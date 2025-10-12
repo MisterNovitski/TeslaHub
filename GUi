@@ -36,6 +36,7 @@ function ModernUI:CreateWindow(options)
         TabWidth = options.TabWidth or 160,
         Size = options.Size or UDim2.fromOffset(580, 460),
         Theme = options.Theme or "Dark",
+        Transparency = options.Transparency or 0.1,
         MinimizeKey = options.MinimizeKey or Enum.KeyCode.RightControl,
         Tabs = {},
         Options = {}
@@ -54,6 +55,7 @@ function ModernUI:CreateWindow(options)
     window.MainFrame.Position = UDim2.new(0.5, -window.Size.X.Offset/2, 0.5, -window.Size.Y.Offset/2)
     window.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
     window.MainFrame.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
+    window.MainFrame.BackgroundTransparency = window.Transparency
     window.MainFrame.BorderSizePixel = 0
     window.MainFrame.Parent = screenGui
     
@@ -65,11 +67,49 @@ function ModernUI:CreateWindow(options)
     window.TitleBar = Instance.new("Frame")
     window.TitleBar.Size = UDim2.new(1, 0, 0, 40)
     window.TitleBar.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+    window.TitleBar.BackgroundTransparency = window.Transparency
     window.TitleBar.BorderSizePixel = 0
     window.TitleBar.Parent = window.MainFrame
     
+    -- Кнопка закрытия
+    window.CloseButton = Instance.new("TextButton")
+    window.CloseButton.Size = UDim2.new(0, 20, 0, 20)
+    window.CloseButton.Position = UDim2.new(1, -25, 0, 10)
+    window.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+    window.CloseButton.BackgroundTransparency = window.Transparency
+    window.CloseButton.BorderSizePixel = 0
+    window.CloseButton.Text = "×"
+    window.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    window.CloseButton.TextSize = 16
+    window.CloseButton.Font = Enum.Font.GothamBold
+    window.CloseButton.Parent = window.TitleBar
+    
+    local CloseCorner = Instance.new("UICorner")
+    CloseCorner.CornerRadius = UDim.new(0, 4)
+    CloseCorner.Parent = window.CloseButton
+    
+    window.CloseButton.MouseEnter:Connect(function()
+        game:GetService("TweenService"):Create(
+            window.CloseButton, 
+            TweenInfo.new(0.2), 
+            {BackgroundColor3 = Color3.fromRGB(255, 50, 50)}
+        ):Play()
+    end)
+    
+    window.CloseButton.MouseLeave:Connect(function()
+        game:GetService("TweenService"):Create(
+            window.CloseButton, 
+            TweenInfo.new(0.2), 
+            {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}
+        ):Play()
+    end)
+    
+    window.CloseButton.MouseButton1Click:Connect(function()
+        screenGui:Destroy()
+    end)
+    
     window.TitleLabel = Instance.new("TextLabel")
-    window.TitleLabel.Size = UDim2.new(1, -20, 0, 20)
+    window.TitleLabel.Size = UDim2.new(1, -50, 0, 20)
     window.TitleLabel.Position = UDim2.new(0, 10, 0, 5)
     window.TitleLabel.BackgroundTransparency = 1
     window.TitleLabel.Text = window.Title
@@ -96,6 +136,7 @@ function ModernUI:CreateWindow(options)
     window.TabContainer.Size = UDim2.new(0, window.TabWidth, 1, -40)
     window.TabContainer.Position = UDim2.new(0, 0, 0, 40)
     window.TabContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+    window.TabContainer.BackgroundTransparency = window.Transparency
     window.TabContainer.BorderSizePixel = 0
     window.TabContainer.Parent = window.MainFrame
     
@@ -155,6 +196,7 @@ function ModernUI:CreateWindow(options)
         tab.Button.Size = UDim2.new(1, -10, 0, 35)
         tab.Button.Position = UDim2.new(0, 5, 0, #window.Tabs * 40 + 5)
         tab.Button.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+        tab.Button.BackgroundTransparency = window.Transparency
         tab.Button.BorderSizePixel = 0
         tab.Button.Text = "  " .. tab.Title
         tab.Button.TextColor3 = ModernUI.Themes[window.Theme].Text
@@ -214,6 +256,7 @@ function ModernUI:CreateWindow(options)
             local button = Instance.new("TextButton")
             button.Size = UDim2.new(1, 0, 0, 35)
             button.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            button.BackgroundTransparency = window.Transparency
             button.BorderSizePixel = 0
             button.Text = options.Title or "Button"
             button.TextColor3 = ModernUI.Themes[window.Theme].Text
@@ -271,6 +314,7 @@ function ModernUI:CreateWindow(options)
             local toggle = Instance.new("Frame")
             toggle.Size = UDim2.new(1, 0, 0, 35)
             toggle.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            toggle.BackgroundTransparency = window.Transparency
             toggle.BorderSizePixel = 0
             toggle.Parent = tab.Content
             
@@ -280,22 +324,22 @@ function ModernUI:CreateWindow(options)
             
             local toggleContainer = Instance.new("Frame")
             toggleContainer.Size = UDim2.new(0, 50, 0, 24)
-            toggleContainer.Position = UDim2.new(1, -55, 0.5, -12)
+            toggleContainer.Position = UDim2.new(1, -60, 0.5, -12)
             toggleContainer.AnchorPoint = Vector2.new(0, 0.5)
             toggleContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Hover
             toggleContainer.BorderSizePixel = 0
             toggleContainer.Parent = toggle
             
             local toggleButton = Instance.new("Frame")
-            toggleButton.Size = UDim2.new(0, 20, 0, 20)
-            toggleButton.Position = UDim2.new(0, 2, 0.5, -10)
+            toggleButton.Size = UDim2.new(0, 18, 0, 18)
+            toggleButton.Position = UDim2.new(0, 3, 0.5, -9)
             toggleButton.AnchorPoint = Vector2.new(0, 0.5)
-            toggleButton.BackgroundColor3 = ModernUI.Themes[window.Theme].Text
+            toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             toggleButton.BorderSizePixel = 0
             toggleButton.Parent = toggleContainer
             
             local toggleLabel = Instance.new("TextLabel")
-            toggleLabel.Size = UDim2.new(1, -60, 1, 0)
+            toggleLabel.Size = UDim2.new(1, -65, 1, 0)
             toggleLabel.Position = UDim2.new(0, 10, 0, 0)
             toggleLabel.BackgroundTransparency = 1
             toggleLabel.Text = toggleName
@@ -311,7 +355,7 @@ function ModernUI:CreateWindow(options)
             UICornerContainer.Parent = toggleContainer
             
             local UICornerToggle = Instance.new("UICorner")
-            UICornerToggle.CornerRadius = UDim.new(0, 10)
+            UICornerToggle.CornerRadius = UDim.new(0, 9)
             UICornerToggle.Parent = toggleButton
             
             local state = options.Default or false
@@ -329,7 +373,7 @@ function ModernUI:CreateWindow(options)
                         toggleButton,
                         TweenInfo.new(0.2),
                         {
-                            Position = UDim2.new(1, -22, 0.5, -10),
+                            Position = UDim2.new(1, -21, 0.5, -9),
                             BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         }
                     ):Play()
@@ -344,8 +388,8 @@ function ModernUI:CreateWindow(options)
                         toggleButton,
                         TweenInfo.new(0.2),
                         {
-                            Position = UDim2.new(0, 2, 0.5, -10),
-                            BackgroundColor3 = ModernUI.Themes[window.Theme].Text
+                            Position = UDim2.new(0, 3, 0.5, -9),
+                            BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         }
                     ):Play()
                 end
@@ -403,6 +447,7 @@ function ModernUI:CreateWindow(options)
             local slider = Instance.new("Frame")
             slider.Size = UDim2.new(1, 0, 0, 50)
             slider.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            slider.BackgroundTransparency = window.Transparency
             slider.BorderSizePixel = 0
             slider.Parent = tab.Content
             
@@ -584,6 +629,7 @@ function ModernUI:CreateWindow(options)
         notify.Size = UDim2.new(0, 300, 0, 80)
         notify.Position = UDim2.new(1, -320, 1, -100)
         notify.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
+        notify.BackgroundTransparency = self.Transparency
         notify.BorderSizePixel = 0
         notify.Parent = self.ScreenGui
         
@@ -626,6 +672,82 @@ function ModernUI:CreateWindow(options)
             end)
         end
     end
+    
+    -- Автоматически создаем вкладку настроек
+    local settingsTab = window:AddTab({Title = "Settings"})
+    
+    -- Настройка прозрачности
+    settingsTab:AddSlider({
+        Title = "Transparency",
+        Description = "Adjust window transparency",
+        Min = 0,
+        Max = 0.8,
+        Default = window.Transparency,
+        Rounding = 0.01,
+        Callback = function(value)
+            window.Transparency = value
+            window.MainFrame.BackgroundTransparency = value
+            window.TitleBar.BackgroundTransparency = value
+            window.TabContainer.BackgroundTransparency = value
+            window.CloseButton.BackgroundTransparency = value
+            
+            -- Обновляем прозрачность всех элементов
+            for _, tab in pairs(window.Tabs) do
+                for _, element in pairs(tab.Elements) do
+                    if element:IsA("Frame") or element:IsA("TextButton") then
+                        element.BackgroundTransparency = value
+                    end
+                end
+                tab.Button.BackgroundTransparency = value
+            end
+        end
+    })
+    
+    -- Переключение темы
+    local themeToggle = settingsTab:AddToggle({
+        Title = "Dark Theme",
+        Description = "Switch between dark and light themes",
+        Default = window.Theme == "Dark"
+    })
+    
+    themeToggle.OnChanged(function(value)
+        window.Theme = value and "Dark" or "Light"
+        local theme = ModernUI.Themes[window.Theme]
+        
+        -- Обновляем цвета интерфейса
+        window.MainFrame.BackgroundColor3 = theme.Background
+        window.TitleBar.BackgroundColor3 = theme.Secondary
+        window.TabContainer.BackgroundColor3 = theme.Secondary
+        window.TitleLabel.TextColor3 = theme.Text
+        window.SubTitleLabel.TextColor3 = theme.Text
+        
+        -- Обновляем вкладки
+        for _, tab in pairs(window.Tabs) do
+            tab.Button.BackgroundColor3 = theme.Secondary
+            tab.Button.TextColor3 = theme.Text
+            tab.Content.ScrollBarImageColor3 = theme.Primary
+            
+            if window.ActiveTab == tab then
+                tab.Button.BackgroundColor3 = theme.Primary
+            end
+            
+            -- Обновляем элементы вкладок
+            for _, element in pairs(tab.Elements) do
+                if element:IsA("TextButton") then
+                    element.BackgroundColor3 = theme.Secondary
+                    element.TextColor3 = theme.Text
+                elseif element:IsA("Frame") then
+                    element.BackgroundColor3 = theme.Secondary
+                    -- Обновляем внутренние элементы
+                    for _, child in pairs(element:GetChildren()) do
+                        if child:IsA("TextLabel") then
+                            child.TextColor3 = theme.Text
+                        end
+                    end
+                end
+            end
+        end
+    })
     
     -- Сохраняем окно
     if not ModernUI.Windows then
