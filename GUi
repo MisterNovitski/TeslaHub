@@ -3,61 +3,19 @@ local ModernUI = {}
 ModernUI.__index = ModernUI
 ModernUI.Version = "1.0.0"
 
--- Темы с единым цветом
+-- Только черная и белая темы
 ModernUI.Themes = {
     Dark = {
-        Primary = Color3.fromRGB(0, 120, 215),
-        Secondary = Color3.fromRGB(35, 35, 35),
         Background = Color3.fromRGB(25, 25, 25),
         Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(60, 60, 60),
-        Hover = Color3.fromRGB(45, 45, 45),
-        Accent = Color3.fromRGB(0, 90, 158)
+        Primary = Color3.fromRGB(0, 120, 215), -- Можно оставить как акцент для переключателей/слайдеров
+        Hover = Color3.fromRGB(45, 45, 45)
     },
     Light = {
-        Primary = Color3.fromRGB(0, 120, 215),
-        Secondary = Color3.fromRGB(230, 230, 230),
         Background = Color3.fromRGB(245, 245, 245),
         Text = Color3.fromRGB(0, 0, 0),
-        Border = Color3.fromRGB(180, 180, 180),
-        Hover = Color3.fromRGB(210, 210, 210),
-        Accent = Color3.fromRGB(0, 90, 158)
-    },
-    Blue = {
-        Primary = Color3.fromRGB(0, 100, 255),
-        Secondary = Color3.fromRGB(20, 40, 80),
-        Background = Color3.fromRGB(10, 30, 60),
-        Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(40, 80, 120),
-        Hover = Color3.fromRGB(30, 60, 100),
-        Accent = Color3.fromRGB(0, 150, 255)
-    },
-    Purple = {
-        Primary = Color3.fromRGB(170, 0, 255),
-        Secondary = Color3.fromRGB(40, 20, 60),
-        Background = Color3.fromRGB(30, 10, 50),
-        Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(80, 40, 100),
-        Hover = Color3.fromRGB(50, 30, 70),
-        Accent = Color3.fromRGB(200, 100, 255)
-    },
-    Green = {
-        Primary = Color3.fromRGB(0, 200, 83),
-        Secondary = Color3.fromRGB(20, 50, 30),
-        Background = Color3.fromRGB(10, 40, 20),
-        Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(40, 100, 60),
-        Hover = Color3.fromRGB(30, 70, 40),
-        Accent = Color3.fromRGB(0, 230, 118)
-    },
-    Red = {
-        Primary = Color3.fromRGB(255, 60, 60),
-        Secondary = Color3.fromRGB(60, 20, 20),
-        Background = Color3.fromRGB(40, 10, 10),
-        Text = Color3.fromRGB(255, 255, 255),
-        Border = Color3.fromRGB(120, 40, 40),
-        Hover = Color3.fromRGB(80, 30, 30),
-        Accent = Color3.fromRGB(255, 100, 100)
+        Primary = Color3.fromRGB(0, 120, 215),
+        Hover = Color3.fromRGB(210, 210, 210)
     }
 }
 
@@ -102,7 +60,7 @@ function ModernUI:CreateWindow(options)
     -- Заголовок
     window.TitleBar = Instance.new("Frame")
     window.TitleBar.Size = UDim2.new(1, 0, 0, 40)
-    window.TitleBar.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+    window.TitleBar.BackgroundColor3 = ModernUI.Themes[window.Theme].Background -- Единый фон
     window.TitleBar.BackgroundTransparency = window.Transparency
     window.TitleBar.BorderSizePixel = 0
     window.TitleBar.Parent = window.MainFrame
@@ -171,7 +129,7 @@ function ModernUI:CreateWindow(options)
     window.TabContainer = Instance.new("Frame")
     window.TabContainer.Size = UDim2.new(0, window.TabWidth, 1, -40)
     window.TabContainer.Position = UDim2.new(0, 0, 0, 40)
-    window.TabContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+    window.TabContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Background -- Единый фон
     window.TabContainer.BackgroundTransparency = window.Transparency
     window.TabContainer.BorderSizePixel = 0
     window.TabContainer.Parent = window.MainFrame
@@ -226,14 +184,14 @@ function ModernUI:CreateWindow(options)
         
         -- Обновляем все цвета интерфейса
         window.MainFrame.BackgroundColor3 = theme.Background
-        window.TitleBar.BackgroundColor3 = theme.Secondary
-        window.TabContainer.BackgroundColor3 = theme.Secondary
+        window.TitleBar.BackgroundColor3 = theme.Background
+        window.TabContainer.BackgroundColor3 = theme.Background
         window.TitleLabel.TextColor3 = theme.Text
         window.SubTitleLabel.TextColor3 = theme.Text
         
         -- Обновляем вкладки
         for _, tab in pairs(window.Tabs) do
-            tab.Button.BackgroundColor3 = theme.Secondary
+            tab.Button.BackgroundColor3 = theme.Background
             tab.Button.TextColor3 = theme.Text
             tab.Content.ScrollBarImageColor3 = theme.Primary
             
@@ -244,11 +202,10 @@ function ModernUI:CreateWindow(options)
             -- Обновляем элементы вкладок
             for _, element in pairs(tab.Elements) do
                 if element:IsA("TextButton") then
-                    element.BackgroundColor3 = theme.Secondary
+                    element.BackgroundColor3 = theme.Background
                     element.TextColor3 = theme.Text
                 elseif element:IsA("Frame") then
-                    element.BackgroundColor3 = theme.Secondary
-                    -- Обновляем внутренние элементы
+                    element.BackgroundColor3 = theme.Background
                     for _, child in pairs(element:GetChildren()) do
                         if child:IsA("TextLabel") then
                             child.TextColor3 = theme.Text
@@ -273,7 +230,7 @@ function ModernUI:CreateWindow(options)
         tab.Button = Instance.new("TextButton")
         tab.Button.Size = UDim2.new(1, -10, 0, 35)
         tab.Button.Position = UDim2.new(0, 5, 0, #window.Tabs * 40 + 5)
-        tab.Button.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+        tab.Button.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
         tab.Button.BackgroundTransparency = window.Transparency
         tab.Button.BorderSizePixel = 0
         tab.Button.Text = "  " .. tab.Title
@@ -320,7 +277,7 @@ function ModernUI:CreateWindow(options)
                 game:GetService("TweenService"):Create(
                     tab.Button, 
                     TweenInfo.new(0.2), 
-                    {BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary}
+                    {BackgroundColor3 = ModernUI.Themes[window.Theme].Background}
                 ):Play()
             end
         end)
@@ -333,7 +290,7 @@ function ModernUI:CreateWindow(options)
         function tab:AddButton(options)
             local button = Instance.new("TextButton")
             button.Size = UDim2.new(1, 0, 0, 35)
-            button.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            button.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
             button.BackgroundTransparency = window.Transparency
             button.BorderSizePixel = 0
             button.Text = options.Title or "Button"
@@ -373,7 +330,7 @@ function ModernUI:CreateWindow(options)
                 game:GetService("TweenService"):Create(
                     button, 
                     TweenInfo.new(0.2), 
-                    {BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary}
+                    {BackgroundColor3 = ModernUI.Themes[window.Theme].Background}
                 ):Play()
             end)
             
@@ -391,7 +348,7 @@ function ModernUI:CreateWindow(options)
             local toggleName = options.Title or "Toggle"
             local toggle = Instance.new("Frame")
             toggle.Size = UDim2.new(1, 0, 0, 35)
-            toggle.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            toggle.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
             toggle.BackgroundTransparency = window.Transparency
             toggle.BorderSizePixel = 0
             toggle.Parent = tab.Content
@@ -400,9 +357,10 @@ function ModernUI:CreateWindow(options)
             UICorner.CornerRadius = UDim.new(0, 4)
             UICorner.Parent = toggle
             
+            -- Исправленный контейнер переключателя: по центру по вертикали
             local toggleContainer = Instance.new("Frame")
-            toggleContainer.Size = UDim2.new(0, 50, 0, 24)
-            toggleContainer.Position = UDim2.new(1, -60, 0.5, -12)
+            toggleContainer.Size = UDim2.new(0, 44, 0, 22)
+            toggleContainer.Position = UDim2.new(1, -54, 0.5, 0) -- Центрирован по Y
             toggleContainer.AnchorPoint = Vector2.new(0, 0.5)
             toggleContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Hover
             toggleContainer.BorderSizePixel = 0
@@ -410,7 +368,7 @@ function ModernUI:CreateWindow(options)
             
             local toggleButton = Instance.new("Frame")
             toggleButton.Size = UDim2.new(0, 18, 0, 18)
-            toggleButton.Position = UDim2.new(0, 3, 0.5, -9)
+            toggleButton.Position = UDim2.new(0, 2, 0.5, 0) -- Центрирован внутри контейнера
             toggleButton.AnchorPoint = Vector2.new(0, 0.5)
             toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
             toggleButton.BorderSizePixel = 0
@@ -427,9 +385,9 @@ function ModernUI:CreateWindow(options)
             toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
             toggleLabel.Parent = toggle
             
-            -- Закругления для контейнера и кнопки
+            -- Закругления
             local UICornerContainer = Instance.new("UICorner")
-            UICornerContainer.CornerRadius = UDim.new(0, 12)
+            UICornerContainer.CornerRadius = UDim.new(0, 11) -- 22/2 = 11
             UICornerContainer.Parent = toggleContainer
             
             local UICornerToggle = Instance.new("UICorner")
@@ -438,10 +396,8 @@ function ModernUI:CreateWindow(options)
             
             local state = options.Default or false
             
-            -- Функция для обновления внешнего вида toggle
             local function updateToggleAppearance()
                 if state then
-                    -- Включено - основной цвет, кружок справа
                     game:GetService("TweenService"):Create(
                         toggleContainer,
                         TweenInfo.new(0.2),
@@ -451,12 +407,11 @@ function ModernUI:CreateWindow(options)
                         toggleButton,
                         TweenInfo.new(0.2),
                         {
-                            Position = UDim2.new(1, -21, 0.5, -9),
+                            Position = UDim2.new(1, -20, 0.5, 0), -- 44 - 18 - 2*2 = 20
                             BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         }
                     ):Play()
                 else
-                    -- Выключено - цвет при наведении, кружок слева
                     game:GetService("TweenService"):Create(
                         toggleContainer,
                         TweenInfo.new(0.2),
@@ -466,17 +421,15 @@ function ModernUI:CreateWindow(options)
                         toggleButton,
                         TweenInfo.new(0.2),
                         {
-                            Position = UDim2.new(0, 3, 0.5, -9),
+                            Position = UDim2.new(0, 2, 0.5, 0),
                             BackgroundColor3 = Color3.fromRGB(255, 255, 255)
                         }
                     ):Play()
                 end
             end
             
-            -- Устанавливаем начальное состояние
             updateToggleAppearance()
             
-            -- Description
             if options.Description then
                 local desc = Instance.new("TextLabel")
                 desc.Size = UDim2.new(1, -10, 0, 15)
@@ -490,7 +443,6 @@ function ModernUI:CreateWindow(options)
                 desc.Parent = toggle
             end
             
-            -- Клик по всему контейнеру toggle
             local clickArea = Instance.new("TextButton")
             clickArea.Size = UDim2.new(1, 0, 1, 0)
             clickArea.BackgroundTransparency = 1
@@ -503,7 +455,6 @@ function ModernUI:CreateWindow(options)
                     clickArea.MouseButton1Click:Connect(function()
                         state = not state
                         updateToggleAppearance()
-                        
                         if callback then
                             callback(state)
                         end
@@ -524,7 +475,7 @@ function ModernUI:CreateWindow(options)
             local sliderName = options.Title or "Slider"
             local slider = Instance.new("Frame")
             slider.Size = UDim2.new(1, 0, 0, 50)
-            slider.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            slider.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
             slider.BackgroundTransparency = window.Transparency
             slider.BorderSizePixel = 0
             slider.Parent = tab.Content
@@ -561,7 +512,7 @@ function ModernUI:CreateWindow(options)
             thumb.Size = UDim2.new(0, 15, 0, 15)
             thumb.AnchorPoint = Vector2.new(0.5, 0.5)
             thumb.Position = UDim2.new(0, 0, 0.5, 0)
-            thumb.BackgroundColor3 = ModernUI.Themes[window.Theme].Accent
+            thumb.BackgroundColor3 = ModernUI.Themes[window.Theme].Primary
             thumb.BorderSizePixel = 0
             thumb.Text = ""
             thumb.Parent = track
@@ -635,7 +586,6 @@ function ModernUI:CreateWindow(options)
             local sliderObj = {
                 Value = currentValue,
                 OnChanged = function(callback)
-                    -- Callback уже установлен в updateSlider
                 end,
                 SetValue = updateSlider
             }
@@ -673,11 +623,10 @@ function ModernUI:CreateWindow(options)
             return label
         end
         
-        -- Функция для добавления селектора тем
         function tab:AddThemeSelector()
             local themeSelector = Instance.new("Frame")
-            themeSelector.Size = UDim2.new(1, 0, 0, 120)
-            themeSelector.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+            themeSelector.Size = UDim2.new(1, 0, 0, 80)
+            themeSelector.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
             themeSelector.BackgroundTransparency = window.Transparency
             themeSelector.BorderSizePixel = 0
             themeSelector.Parent = tab.Content
@@ -697,9 +646,8 @@ function ModernUI:CreateWindow(options)
             title.TextXAlignment = Enum.TextXAlignment.Left
             title.Parent = themeSelector
             
-            -- Контейнер для кнопок тем
             local themesContainer = Instance.new("Frame")
-            themesContainer.Size = UDim2.new(1, -20, 0, 85)
+            themesContainer.Size = UDim2.new(1, -20, 0, 40)
             themesContainer.Position = UDim2.new(0, 10, 0, 30)
             themesContainer.BackgroundTransparency = 1
             themesContainer.Parent = themeSelector
@@ -709,8 +657,7 @@ function ModernUI:CreateWindow(options)
             UIListLayout.Padding = UDim.new(0, 5)
             UIListLayout.Parent = themesContainer
             
-            -- Создаем кнопки для каждой темы
-            local themeNames = {"Dark", "Light", "Blue", "Purple", "Green", "Red"}
+            local themeNames = {"Dark", "Light"}
             
             for _, themeName in pairs(themeNames) do
                 local themeButton = Instance.new("TextButton")
@@ -728,7 +675,6 @@ function ModernUI:CreateWindow(options)
                 ThemeCorner.CornerRadius = UDim.new(0, 4)
                 ThemeCorner.Parent = themeButton
                 
-                -- Подсветка активной темы
                 if themeName == window.Theme then
                     themeButton.BackgroundTransparency = 0
                 end
@@ -752,19 +698,13 @@ function ModernUI:CreateWindow(options)
                 end)
                 
                 themeButton.MouseButton1Click:Connect(function()
-                    -- Сбрасываем прозрачность всех кнопок
                     for _, btn in pairs(themesContainer:GetChildren()) do
                         if btn:IsA("TextButton") then
                             btn.BackgroundTransparency = 0.2
                         end
                     end
-                    
-                    -- Устанавливаем полную непрозрачность для выбранной темы
                     themeButton.BackgroundTransparency = 0
-                    
-                    -- Применяем тему
                     window:UpdateTheme(themeName)
-                    
                     ModernUI:Notify({
                         Title = "Theme Changed",
                         Content = "Applied " .. themeName .. " theme",
@@ -779,7 +719,6 @@ function ModernUI:CreateWindow(options)
         
         table.insert(window.Tabs, tab)
         
-        -- Активируем первую вкладку
         if #window.Tabs == 1 then
             window:SelectTab(tab)
         end
@@ -793,7 +732,7 @@ function ModernUI:CreateWindow(options)
             game:GetService("TweenService"):Create(
                 self.ActiveTab.Button, 
                 TweenInfo.new(0.2), 
-                {BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary}
+                {BackgroundColor3 = ModernUI.Themes[self.Theme].Background}
             ):Play()
         end
         
@@ -810,7 +749,7 @@ function ModernUI:CreateWindow(options)
         local notify = Instance.new("Frame")
         notify.Size = UDim2.new(0, 300, 0, 80)
         notify.Position = UDim2.new(1, -320, 1, -100)
-        notify.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
+        notify.BackgroundColor3 = ModernUI.Themes[self.Theme].Background
         notify.BackgroundTransparency = self.Transparency
         notify.BorderSizePixel = 0
         notify.Parent = self.ScreenGui
@@ -858,7 +797,6 @@ function ModernUI:CreateWindow(options)
     -- Автоматически создаем вкладку настроек
     local settingsTab = window:AddTab({Title = "Settings"})
     
-    -- Настройка прозрачности
     settingsTab:AddSlider({
         Title = "Transparency",
         Description = "Adjust window transparency",
@@ -873,7 +811,6 @@ function ModernUI:CreateWindow(options)
             window.TabContainer.BackgroundTransparency = value
             window.CloseButton.BackgroundTransparency = value
             
-            -- Обновляем прозрачность всех элементов
             for _, tab in pairs(window.Tabs) do
                 for _, element in pairs(tab.Elements) do
                     if element:IsA("Frame") or element:IsA("TextButton") then
@@ -885,10 +822,8 @@ function ModernUI:CreateWindow(options)
         end
     })
     
-    -- Селектор тем
     settingsTab:AddThemeSelector()
     
-    -- Сохраняем окно
     if not ModernUI.Windows then
         ModernUI.Windows = {}
     end
@@ -902,64 +837,3 @@ function ModernUI:Notify(options)
         self.Windows[1]:Notify(options)
     end
 end
-
--- Теперь используем библиотеку
-local Window = ModernUI:CreateWindow({
-    Title = "ModernUI " .. ModernUI.Version,
-    SubTitle = "by Your Name",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Theme = "Dark",
-    MinimizeKey = Enum.KeyCode.RightControl
-})
-
--- Создание вкладок
-local MainTab = Window:AddTab({ Title = "Main", Icon = "home" })
-local SettingsTab = Window:AddTab({ Title = "Settings", Icon = "settings" })
-
--- Уведомление
-ModernUI:Notify({
-    Title = "ModernUI",
-    Content = "The script has been loaded!",
-    Duration = 5
-})
-
--- Элементы на главной вкладке
-MainTab:AddLabel({
-    Title = "Welcome to ModernUI",
-    Content = "This is a custom UI library with unified colors"
-})
-
-MainTab:AddButton({
-    Title = "Test Button",
-    Description = "Click me to test",
-    Callback = function()
-        ModernUI:Notify({
-            Title = "Button Clicked!",
-            Content = "You clicked the test button",
-            Duration = 3
-        })
-    end
-})
-
-local MyToggle = MainTab:AddToggle({
-    Title = "Enable Feature",
-    Description = "Toggle this feature on/off",
-    Default = false
-})
-
-MyToggle.OnChanged(function(value)
-    print("Toggle changed to:", value)
-end)
-
-local MySlider = MainTab:AddSlider({
-    Title = "Volume",
-    Description = "Adjust the volume level",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Rounding = 1,
-    Callback = function(value)
-        print("Volume set to:", value)
-    end
-})
