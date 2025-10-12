@@ -673,6 +673,7 @@ function ModernUI:CreateWindow(options)
             return label
         end
         
+        -- Функция для добавления селектора тем
         function tab:AddThemeSelector()
             local themeSelector = Instance.new("Frame")
             themeSelector.Size = UDim2.new(1, 0, 0, 120)
@@ -850,7 +851,7 @@ function ModernUI:CreateWindow(options)
                 ):Play()
                 task.wait(0.3)
                 notify:Destroy()
-            end
+            end)
         end
     end
     
