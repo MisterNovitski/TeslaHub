@@ -1,620 +1,249 @@
--- ===== ВСТРОЕННАЯ БИБЛИОТЕКА ModernUI (без внешних зависимостей) =====
+-- ModernUI.lua
+-- Cleaned, simplified, Dark/Light themes only
+-- Author: Modernized by ChatGPT
+
 local ModernUI = {}
 ModernUI.__index = ModernUI
 
+-- ✅ Две темы: Dark и Light
 ModernUI.Themes = {
     Dark = {
+        Primary = Color3.fromRGB(0, 120, 215),
+        Secondary = Color3.fromRGB(40, 40, 40),
         Background = Color3.fromRGB(25, 25, 25),
         Text = Color3.fromRGB(255, 255, 255),
-        Primary = Color3.fromRGB(0, 120, 215),
-        Hover = Color3.fromRGB(45, 45, 45)
+        Border = Color3.fromRGB(60, 60, 60),
+        Hover = Color3.fromRGB(55, 55, 55),
+        Accent = Color3.fromRGB(0, 120, 215)
     },
     Light = {
-        Background = Color3.fromRGB(245, 245, 245),
-        Text = Color3.fromRGB(0, 0, 0),
         Primary = Color3.fromRGB(0, 120, 215),
-        Hover = Color3.fromRGB(210, 210, 210)
+        Secondary = Color3.fromRGB(240, 240, 240),
+        Background = Color3.fromRGB(255, 255, 255),
+        Text = Color3.fromRGB(0, 0, 0),
+        Border = Color3.fromRGB(200, 200, 200),
+        Hover = Color3.fromRGB(225, 225, 225),
+        Accent = Color3.fromRGB(0, 120, 215)
     }
 }
 
+-- 🪟 Создание окна
 function ModernUI:CreateWindow(options)
-    options = options or {}
-    local window = {
-        Title = options.Title or "ModernUI",
-        SubTitle = options.SubTitle or "by ModernUI",
-        TabWidth = options.TabWidth or 160,
-        Size = options.Size or UDim2.fromOffset(580, 460),
-        Theme = options.Theme or "Dark",
-        Transparency = options.Transparency or 0.1,
-        Tabs = {},
-        Options = {}
-    }
+    local window = setmetatable({}, ModernUI)
+    window.Title = options.Title or "Modern UI"
+    window.Size = options.Size or UDim2.new(0, 500, 0, 400)
+    window.Theme = options.Theme or "Dark"
+    window.Transparency = options.Transparency or 0
+    window.Options = {}
 
+    -- Main ScreenGui
     local screenGui = Instance.new("ScreenGui")
-    screenGui.Name = "ModernUIGui"
-    screenGui.ResetOnSpawn = false
-    screenGui.Parent = game:GetService("Players").LocalPlayer:WaitForChild("PlayerGui")
+    screenGui.Name = "ModernUI"
+    screenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = window.Size
+    mainFrame.Position = UDim2.new(0.5, -window.Size.X.Offset / 2, 0.5, -window.Size.Y.Offset / 2)
+    mainFrame.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
+    mainFrame.BorderSizePixel = 0
+    mainFrame.Parent = screenGui
+
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = mainFrame
+
+    local titleBar = Instance.new("TextLabel")
+    titleBar.Size = UDim2.new(1, 0, 0, 30)
+    titleBar.BackgroundColor3 = ModernUI.Themes[window.Theme].Secondary
+    titleBar.Text = window.Title
+    titleBar.TextColor3 = ModernUI.Themes[window.Theme].Text
+    titleBar.TextSize = 16
+    titleBar.Font = Enum.Font.GothamBold
+    titleBar.Parent = mainFrame
+
+    window.MainFrame = mainFrame
     window.ScreenGui = screenGui
-
-    window.MainFrame = Instance.new("Frame")
-    window.MainFrame.Size = window.Size
-    window.MainFrame.Position = UDim2.new(0.5, -window.Size.X.Offset/2, 0.5, -window.Size.Y.Offset/2)
-    window.MainFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-    window.MainFrame.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-    window.MainFrame.BackgroundTransparency = window.Transparency
-    window.MainFrame.BorderSizePixel = 0
-    window.MainFrame.Parent = screenGui
-
-    local UICorner = Instance.new("UICorner")
-    UICorner.CornerRadius = UDim.new(0, 8)
-    UICorner.Parent = window.MainFrame
-
-    window.TitleBar = Instance.new("Frame")
-    window.TitleBar.Size = UDim2.new(1, 0, 0, 40)
-    window.TitleBar.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-    window.TitleBar.BackgroundTransparency = window.Transparency
-    window.TitleBar.BorderSizePixel = 0
-    window.TitleBar.Parent = window.MainFrame
-
-    window.CloseButton = Instance.new("TextButton")
-    window.CloseButton.Size = UDim2.new(0, 20, 0, 20)
-    window.CloseButton.Position = UDim2.new(1, -25, 0, 10)
-    window.CloseButton.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-    window.CloseButton.BackgroundTransparency = window.Transparency
-    window.CloseButton.BorderSizePixel = 0
-    window.CloseButton.Text = "×"
-    window.CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
-    window.CloseButton.TextSize = 16
-    window.CloseButton.Font = Enum.Font.GothamBold
-    window.CloseButton.Parent = window.TitleBar
-
-    local CloseCorner = Instance.new("UICorner")
-    CloseCorner.CornerRadius = UDim.new(0, 4)
-    CloseCorner.Parent = window.CloseButton
-
-    window.CloseButton.MouseButton1Click:Connect(function()
-        screenGui:Destroy()
-    end)
-
-    window.TitleLabel = Instance.new("TextLabel")
-    window.TitleLabel.Size = UDim2.new(1, -50, 0, 20)
-    window.TitleLabel.Position = UDim2.new(0, 10, 0, 5)
-    window.TitleLabel.BackgroundTransparency = 1
-    window.TitleLabel.Text = window.Title
-    window.TitleLabel.TextColor3 = ModernUI.Themes[window.Theme].Text
-    window.TitleLabel.TextSize = 18
-    window.TitleLabel.Font = Enum.Font.GothamBold
-    window.TitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    window.TitleLabel.Parent = window.TitleBar
-
-    window.SubTitleLabel = Instance.new("TextLabel")
-    window.SubTitleLabel.Size = UDim2.new(1, -20, 0, 15)
-    window.SubTitleLabel.Position = UDim2.new(0, 10, 0, 22)
-    window.SubTitleLabel.BackgroundTransparency = 1
-    window.SubTitleLabel.Text = window.SubTitle
-    window.SubTitleLabel.TextColor3 = ModernUI.Themes[window.Theme].Text
-    window.SubTitleLabel.TextSize = 12
-    window.SubTitleLabel.Font = Enum.Font.Gotham
-    window.SubTitleLabel.TextXAlignment = Enum.TextXAlignment.Left
-    window.SubTitleLabel.TextTransparency = 0.5
-    window.SubTitleLabel.Parent = window.TitleBar
-
-    window.TabContainer = Instance.new("Frame")
-    window.TabContainer.Size = UDim2.new(0, window.TabWidth, 1, -40)
-    window.TabContainer.Position = UDim2.new(0, 0, 0, 40)
-    window.TabContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-    window.TabContainer.BackgroundTransparency = window.Transparency
-    window.TabContainer.BorderSizePixel = 0
-    window.TabContainer.Parent = window.MainFrame
-
-    window.ContentContainer = Instance.new("Frame")
-    window.ContentContainer.Size = UDim2.new(1, -window.TabWidth, 1, -40)
-    window.ContentContainer.Position = UDim2.new(0, window.TabWidth, 0, 40)
-    window.ContentContainer.BackgroundTransparency = 1
-    window.ContentContainer.Parent = window.MainFrame
-
-    local dragging = false
-    local dragStart, startPos
-
-    window.TitleBar.InputBegan:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then
-            dragging = true
-            dragStart = input.Position
-            startPos = window.MainFrame.Position
-            input.Changed:Connect(function()
-                if input.UserInputState == Enum.UserInputState.End then
-                    dragging = false
-                end
-            end)
-        end
-    end)
-
-    game:GetService("UserInputService").InputChanged:Connect(function(input)
-        if input.UserInputType == Enum.UserInputType.MouseMovement and dragging then
-            local delta = input.Position - dragStart
-            window.MainFrame.Position = UDim2.new(
-                startPos.X.Scale, startPos.X.Offset + delta.X,
-                startPos.Y.Scale, startPos.Y.Offset + delta.Y
-            )
-        end
-    end)
-
-    function window:UpdateTheme(themeName)
-        window.Theme = themeName
-        local theme = ModernUI.Themes[themeName]
-        window.MainFrame.BackgroundColor3 = theme.Background
-        window.TitleBar.BackgroundColor3 = theme.Background
-        window.TabContainer.BackgroundColor3 = theme.Background
-        window.TitleLabel.TextColor3 = theme.Text
-        window.SubTitleLabel.TextColor3 = theme.Text
-
-        for _, tab in pairs(window.Tabs) do
-            tab.Button.BackgroundColor3 = theme.Background
-            tab.Button.TextColor3 = theme.Text
-            tab.Content.ScrollBarImageColor3 = theme.Primary
-            if window.ActiveTab == tab then
-                tab.Button.BackgroundColor3 = theme.Primary
-            end
-            for _, element in pairs(tab.Elements) do
-                if element:IsA("TextButton") then
-                    element.BackgroundColor3 = theme.Background
-                    element.TextColor3 = theme.Text
-                elseif element:IsA("Frame") then
-                    element.BackgroundColor3 = theme.Background
-                    for _, child in pairs(element:GetChildren()) do
-                        if child:IsA("TextLabel") then
-                            child.TextColor3 = theme.Text
-                        elseif child:IsA("Frame") and child.Name ~= "ThemeSelector" then
-                            child.BackgroundColor3 = theme.Hover
-                        end
-                    end
-                end
-            end
-        end
-    end
-
-    function window:AddTab(options)
-        local tab = { Title = options.Title or "Tab", Elements = {} }
-        tab.Button = Instance.new("TextButton")
-        tab.Button.Size = UDim2.new(1, -10, 0, 35)
-        tab.Button.Position = UDim2.new(0, 5, 0, #window.Tabs * 40 + 5)
-        tab.Button.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-        tab.Button.BackgroundTransparency = window.Transparency
-        tab.Button.BorderSizePixel = 0
-        tab.Button.Text = "  " .. tab.Title
-        tab.Button.TextColor3 = ModernUI.Themes[window.Theme].Text
-        tab.Button.TextSize = 14
-        tab.Button.Font = Enum.Font.Gotham
-        tab.Button.TextXAlignment = Enum.TextXAlignment.Left
-        tab.Button.Parent = window.TabContainer
-
-        local UICorner = Instance.new("UICorner")
-        UICorner.CornerRadius = UDim.new(0, 4)
-        UICorner.Parent = tab.Button
-
-        tab.Content = Instance.new("ScrollingFrame")
-        tab.Content.Size = UDim2.new(1, -20, 1, -20)
-        tab.Content.Position = UDim2.new(0, 10, 0, 10)
-        tab.Content.BackgroundTransparency = 1
-        tab.Content.BorderSizePixel = 0
-        tab.Content.ScrollBarThickness = 3
-        tab.Content.ScrollBarImageColor3 = ModernUI.Themes[window.Theme].Primary
-        tab.Content.CanvasSize = UDim2.new(0, 0, 0, 0)
-        tab.Content.AutomaticCanvasSize = Enum.AutomaticSize.Y
-        tab.Content.Visible = false
-        tab.Content.Parent = window.ContentContainer
-
-        Instance.new("UIListLayout").Parent = tab.Content
-
-        tab.Button.MouseEnter:Connect(function()
-            if window.ActiveTab ~= tab then
-                game:GetService("TweenService"):Create(tab.Button, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[window.Theme].Hover}):Play()
-            end
-        end)
-
-        tab.Button.MouseLeave:Connect(function()
-            if window.ActiveTab ~= tab then
-                game:GetService("TweenService"):Create(tab.Button, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[window.Theme].Background}):Play()
-            end
-        end)
-
-        tab.Button.MouseButton1Click:Connect(function()
-            window:SelectTab(tab)
-        end)
-
-        function tab:AddButton(options)
-            local button = Instance.new("TextButton")
-            button.Size = UDim2.new(1, 0, 0, 35)
-            button.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-            button.BackgroundTransparency = window.Transparency
-            button.BorderSizePixel = 0
-            button.Text = options.Title or "Button"
-            button.TextColor3 = ModernUI.Themes[window.Theme].Text
-            button.TextSize = 14
-            button.Font = Enum.Font.Gotham
-            button.Parent = tab.Content
-
-            Instance.new("UICorner").Parent = button
-
-            if options.Description then
-                local desc = Instance.new("TextLabel")
-                desc.Size = UDim2.new(1, -10, 0, 15)
-                desc.Position = UDim2.new(0, 5, 1, -15)
-                desc.BackgroundTransparency = 1
-                desc.Text = options.Description
-                desc.TextColor3 = ModernUI.Themes[window.Theme].Text
-                desc.TextSize = 11
-                desc.Font = Enum.Font.Gotham
-                desc.TextTransparency = 0.5
-                desc.Parent = button
-            end
-
-            button.MouseEnter:Connect(function()
-                game:GetService("TweenService"):Create(button, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[window.Theme].Hover}):Play()
-            end)
-
-            button.MouseLeave:Connect(function()
-                game:GetService("TweenService"):Create(button, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[window.Theme].Background}):Play()
-            end)
-
-            button.MouseButton1Click:Connect(function()
-                if options.Callback then options.Callback() end
-            end)
-
-            table.insert(tab.Elements, button)
-            return button
-        end
-
-        function tab:AddToggle(options)
-            local toggleName = options.Title or "Toggle"
-            local toggle = Instance.new("Frame")
-            toggle.Size = UDim2.new(1, 0, 0, 35)
-            toggle.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-            toggle.BackgroundTransparency = window.Transparency
-            toggle.BorderSizePixel = 0
-            toggle.Parent = tab.Content
-
-            Instance.new("UICorner").Parent = toggle
-
-            local toggleContainer = Instance.new("Frame")
-            toggleContainer.Size = UDim2.new(0, 44, 0, 22)
-            toggleContainer.Position = UDim2.new(1, -54, 0.5, 0)
-            toggleContainer.AnchorPoint = Vector2.new(0, 0.5)
-            toggleContainer.BackgroundColor3 = ModernUI.Themes[window.Theme].Hover
-            toggleContainer.BorderSizePixel = 0
-            toggleContainer.Parent = toggle
-
-            local toggleButton = Instance.new("Frame")
-            toggleButton.Size = UDim2.new(0, 18, 0, 18)
-            toggleButton.Position = UDim2.new(0, 2, 0.5, 0)
-            toggleButton.AnchorPoint = Vector2.new(0, 0.5)
-            toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
-            toggleButton.BorderSizePixel = 0
-            toggleButton.Parent = toggleContainer
-
-            Instance.new("UICorner").CornerRadius = UDim.new(0, 11).Parent = toggleContainer
-            Instance.new("UICorner").CornerRadius = UDim.new(0, 9).Parent = toggleButton
-
-            local toggleLabel = Instance.new("TextLabel")
-            toggleLabel.Size = UDim2.new(1, -65, 1, 0)
-            toggleLabel.Position = UDim2.new(0, 10, 0, 0)
-            toggleLabel.BackgroundTransparency = 1
-            toggleLabel.Text = toggleName
-            toggleLabel.TextColor3 = ModernUI.Themes[window.Theme].Text
-            toggleLabel.TextSize = 14
-            toggleLabel.Font = Enum.Font.Gotham
-            toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
-            toggleLabel.Parent = toggle
-
-            if options.Description then
-                local desc = Instance.new("TextLabel")
-                desc.Size = UDim2.new(1, -10, 0, 15)
-                desc.Position = UDim2.new(0, 10, 1, -15)
-                desc.BackgroundTransparency = 1
-                desc.Text = options.Description
-                desc.TextColor3 = ModernUI.Themes[window.Theme].Text
-                desc.TextSize = 11
-                desc.Font = Enum.Font.Gotham
-                desc.TextTransparency = 0.5
-                desc.Parent = toggle
-            end
-
-            local state = options.Default or false
-            local function updateToggleAppearance()
-                if state then
-                    game:GetService("TweenService"):Create(toggleContainer, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[window.Theme].Primary}):Play()
-                    game:GetService("TweenService"):Create(toggleButton, TweenInfo.new(0.2), {Position = UDim2.new(1, -20, 0.5, 0)}):Play()
-                else
-                    game:GetService("TweenService"):Create(toggleContainer, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[window.Theme].Hover}):Play()
-                    game:GetService("TweenService"):Create(toggleButton, TweenInfo.new(0.2), {Position = UDim2.new(0, 2, 0.5, 0)}):Play()
-                end
-            end
-
-            updateToggleAppearance()
-
-            local clickArea = Instance.new("TextButton")
-            clickArea.Size = UDim2.new(1, 0, 1, 0)
-            clickArea.BackgroundTransparency = 1
-            clickArea.Text = ""
-            clickArea.Parent = toggle
-
-            local toggleObj = {
-                Value = state,
-                OnChanged = function(callback)
-                    clickArea.MouseButton1Click:Connect(function()
-                        state = not state
-                        updateToggleAppearance()
-                        if callback then callback(state) end
-                    end)
-                end,
-                SetValue = function(newValue)
-                    state = newValue
-                    updateToggleAppearance()
-                end
-            }
-
-            window.Options[toggleName] = toggleObj
-            table.insert(tab.Elements, toggle)
-            return toggleObj
-        end
-
-        function tab:AddSlider(options)
-            local sliderName = options.Title or "Slider"
-            local slider = Instance.new("Frame")
-            slider.Size = UDim2.new(1, 0, 0, 50)
-            slider.BackgroundColor3 = ModernUI.Themes[window.Theme].Background
-            slider.BackgroundTransparency = window.Transparency
-            slider.BorderSizePixel = 0
-            slider.Parent = tab.Content
-
-            Instance.new("UICorner").Parent = slider
-
-            local sliderLabel = Instance.new("TextLabel")
-            sliderLabel.Size = UDim2.new(1, -10, 0, 20)
-            sliderLabel.Position = UDim2.new(0, 10, 0, 5)
-            sliderLabel.BackgroundTransparency = 1
-            sliderLabel.Text = sliderName
-            sliderLabel.TextColor3 = ModernUI.Themes[window.Theme].Text
-            sliderLabel.TextSize = 14
-            sliderLabel.Font = Enum.Font.Gotham
-            sliderLabel.TextXAlignment = Enum.TextXAlignment.Left
-            sliderLabel.Parent = slider
-
-            local track = Instance.new("Frame")
-            track.Size = UDim2.new(1, -20, 0, 6)
-            track.Position = UDim2.new(0, 10, 0, 30)
-            track.BackgroundColor3 = ModernUI.Themes[window.Theme].Hover
-            track.BorderSizePixel = 0
-            track.Parent = slider
-
-            local fill = Instance.new("Frame")
-            fill.Size = UDim2.new(0, 0, 1, 0)
-            fill.BackgroundColor3 = ModernUI.Themes[window.Theme].Primary
-            fill.BorderSizePixel = 0
-            fill.Parent = track
-
-            local thumb = Instance.new("TextButton")
-            thumb.Size = UDim2.new(0, 15, 0, 15)
-            thumb.AnchorPoint = Vector2.new(0.5, 0.5)
-            thumb.Position = UDim2.new(0, 0, 0.5, 0)
-            thumb.BackgroundColor3 = ModernUI.Themes[window.Theme].Primary
-            thumb.BorderSizePixel = 0
-            thumb.Text = ""
-            thumb.Parent = track
-
-            local valueLabel = Instance.new("TextLabel")
-            valueLabel.Size = UDim2.new(0, 50, 0, 20)
-            valueLabel.Position = UDim2.new(1, -50, 0, 5)
-            valueLabel.BackgroundTransparency = 1
-            valueLabel.Text = tostring(options.Default or options.Min or 0)
-            valueLabel.TextColor3 = ModernUI.Themes[window.Theme].Text
-            valueLabel.TextSize = 12
-            valueLabel.Font = Enum.Font.Gotham
-            valueLabel.TextXAlignment = Enum.TextXAlignment.Right
-            valueLabel.Parent = slider
-
-            for _, obj in ipairs({track, fill, thumb}) do
-                Instance.new("UICorner").CornerRadius = UDim.new(0, obj == thumb and 7 or 3).Parent = obj
-            end
-
-            local minValue = options.Min or 0
-            local maxValue = options.Max or 100
-            local currentValue = options.Default or minValue
-            local rounding = options.Rounding or 1
-
-            local function updateSlider(value)
-                local normalized = math.clamp((value - minValue) / (maxValue - minValue), 0, 1)
-                fill.Size = UDim2.new(normalized, 0, 1, 0)
-                thumb.Position = UDim2.new(normalized, 0, 0.5, 0)
-                valueLabel.Text = tostring(math.floor(value / rounding) * rounding)
-                currentValue = value
-                if options.Callback then options.Callback(value) end
-            end
-
-            local dragging = false
-            thumb.InputBegan:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = true
-                end
-            end)
-            thumb.InputEnded:Connect(function(input)
-                if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                    dragging = false
-                end
-            end)
-            game:GetService("UserInputService").InputChanged:Connect(function(input)
-                if dragging and input.UserInputType == Enum.UserInputType.MouseMovement then
-                    local mousePos = game:GetService("Players").LocalPlayer:GetMouse()
-                    local relativeX = mousePos.X - track.AbsolutePosition.X
-                    local normalized = math.clamp(relativeX / track.AbsoluteSize.X, 0, 1)
-                    local value = minValue + (maxValue - minValue) * normalized
-                    updateSlider(value)
-                end
-            end)
-
-            updateSlider(currentValue)
-
-            local sliderObj = { Value = currentValue, SetValue = updateSlider }
-            window.Options[sliderName] = sliderObj
-            table.insert(tab.Elements, slider)
-            return sliderObj
-        end
-
-        function tab:AddLabel(options)
-            local label = Instance.new("TextLabel")
-            label.Size = UDim2.new(1, 0, 0, 20)
-            label.BackgroundTransparency = 1
-            label.Text = options.Title or "Label"
-            label.TextColor3 = ModernUI.Themes[window.Theme].Text
-            label.TextSize = 14
-            label.Font = Enum.Font.Gotham
-            label.TextXAlignment = Enum.TextXAlignment.Left
-            label.Parent = tab.Content
-
-            if options.Content then
-                local content = Instance.new("TextLabel")
-                content.Size = UDim2.new(1, 0, 0, 15)
-                content.Position = UDim2.new(0, 0, 1, 0)
-                content.BackgroundTransparency = 1
-                content.Text = options.Content
-                content.TextColor3 = ModernUI.Themes[window.Theme].Text
-                content.TextSize = 12
-                content.Font = Enum.Font.Gotham
-                content.TextTransparency = 0.5
-                content.Parent = label
-            end
-
-            table.insert(tab.Elements, label)
-            return label
-        end
-
-        table.insert(window.Tabs, tab)
-        if #window.Tabs == 1 then window:SelectTab(tab) end
-        return tab
-    end
-
-    function window:SelectTab(selectedTab)
-        if self.ActiveTab then
-            self.ActiveTab.Content.Visible = false
-            game:GetService("TweenService"):Create(self.ActiveTab.Button, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[self.Theme].Background}):Play()
-        end
-        self.ActiveTab = selectedTab
-        selectedTab.Content.Visible = true
-        game:GetService("TweenService"):Create(selectedTab.Button, TweenInfo.new(0.2), {BackgroundColor3 = ModernUI.Themes[self.Theme].Primary}):Play()
-    end
-
-    function window:Notify(options)
-        local notify = Instance.new("Frame")
-        notify.Size = UDim2.new(0, 300, 0, 80)
-        notify.Position = UDim2.new(1, -320, 1, -100)
-        notify.BackgroundColor3 = ModernUI.Themes[self.Theme].Background
-        notify.BackgroundTransparency = self.Transparency
-        notify.BorderSizePixel = 0
-        notify.Parent = self.ScreenGui
-
-        Instance.new("UICorner").CornerRadius = UDim.new(0, 8).Parent = notify
-
-        local title = Instance.new("TextLabel")
-        title.Size = UDim2.new(1, -20, 0, 25)
-        title.Position = UDim2.new(0, 10, 0, 10)
-        title.BackgroundTransparency = 1
-        title.Text = options.Title or "Notification"
-        title.TextColor3 = ModernUI.Themes[self.Theme].Text
-        title.TextSize = 16
-        title.Font = Enum.Font.GothamBold
-        title.TextXAlignment = Enum.TextXAlignment.Left
-        title.Parent = notify
-
-        local content = Instance.new("TextLabel")
-        content.Size = UDim2.new(1, -20, 0, 35)
-        content.Position = UDim2.new(0, 10, 0, 35)
-        content.BackgroundTransparency = 1
-        content.Text = options.Content or "This is a notification"
-        content.TextColor3 = ModernUI.Themes[self.Theme].Text
-        content.TextSize = 14
-        content.Font = Enum.Font.Gotham
-        content.TextXAlignment = Enum.TextXAlignment.Left
-        content.TextYAlignment = Enum.TextYAlignment.Top
-        content.Parent = notify
-
-        if options.Duration then
-            task.delay(options.Duration, function()
-                game:GetService("TweenService"):Create(notify, TweenInfo.new(0.3), {Position = UDim2.new(1, -320, 1, 100)}):Play()
-                task.wait(0.3)
-                notify:Destroy()
-            end)
-        end
-    end
+    window.Tabs = {}
 
     return window
 end
 
--- ===== ОСНОВНОЙ СКРИПТ =====
-local Window = ModernUI:CreateWindow({
-    Title = "ModernUI",
-    SubTitle = "by Your Name",
-    TabWidth = 160,
-    Size = UDim2.fromOffset(580, 460),
-    Theme = "Dark"
-})
+-- 🧭 Добавление вкладки
+function ModernUI:CreateTab(name)
+    local tab = {}
+    tab.Name = name
+    tab.Elements = {}
 
-Window.ScreenGui.Enabled = false -- Скрыть сразу
+    local content = Instance.new("Frame")
+    content.Size = UDim2.new(1, -20, 1, -40)
+    content.Position = UDim2.new(0, 10, 0, 35)
+    content.BackgroundTransparency = 1
+    content.Parent = self.MainFrame
 
-local Tabs = {
-    Main = Window:AddTab({ Title = "Main" }),
-    Settings = Window:AddTab({ Title = "Settings" })
-}
+    tab.Content = content
+    table.insert(self.Tabs, tab)
+    return tab
+end
 
-ModernUI:Notify({
-    Title = "ModernUI",
-    Content = "Loaded! Press RightControl to open.",
-    Duration = 4
-})
+-- 🕹 Переключатель (Toggle)
+function ModernUI:AddToggle(options)
+    local toggleName = options.Title or "Toggle"
+    local toggle = Instance.new("Frame")
+    toggle.Size = UDim2.new(1, 0, 0, 35)
+    toggle.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
+    toggle.BackgroundTransparency = self.Transparency
+    toggle.BorderSizePixel = 0
+    toggle.Parent = self.Content
 
-Tabs.Main:AddLabel({
-    Title = "Welcome to ModernUI",
-    Content = "This is a custom UI library inspired by Fluent"
-})
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 4)
+    UICorner.Parent = toggle
 
-Tabs.Main:AddButton({
-    Title = "Test Button",
-    Description = "Click me to test",
-    Callback = function()
-        ModernUI:Notify({
-            Title = "Button Clicked!",
-            Content = "You clicked the test button",
-            Duration = 3
-        })
+    local toggleContainer = Instance.new("Frame")
+    toggleContainer.Size = UDim2.new(0, 46, 0, 22)
+    toggleContainer.Position = UDim2.new(1, -60, 0.5, 0)
+    toggleContainer.AnchorPoint = Vector2.new(0, 0.5)
+    toggleContainer.BackgroundColor3 = ModernUI.Themes[self.Theme].Hover
+    toggleContainer.BorderSizePixel = 0
+    toggleContainer.Parent = toggle
+
+    local UICornerContainer = Instance.new("UICorner")
+    UICornerContainer.CornerRadius = UDim.new(1, 0)
+    UICornerContainer.Parent = toggleContainer
+
+    local toggleButton = Instance.new("Frame")
+    toggleButton.Size = UDim2.new(0, 18, 0, 18)
+    toggleButton.Position = UDim2.new(0, 3, 0.5, 0)
+    toggleButton.AnchorPoint = Vector2.new(0, 0.5)
+    toggleButton.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
+    toggleButton.BorderSizePixel = 0
+    toggleButton.Parent = toggleContainer
+
+    local UICornerToggle = Instance.new("UICorner")
+    UICornerToggle.CornerRadius = UDim.new(1, 0)
+    UICornerToggle.Parent = toggleButton
+
+    local toggleLabel = Instance.new("TextLabel")
+    toggleLabel.Size = UDim2.new(1, -70, 1, 0)
+    toggleLabel.Position = UDim2.new(0, 10, 0, 0)
+    toggleLabel.BackgroundTransparency = 1
+    toggleLabel.Text = toggleName
+    toggleLabel.TextColor3 = ModernUI.Themes[self.Theme].Text
+    toggleLabel.TextSize = 14
+    toggleLabel.Font = Enum.Font.Gotham
+    toggleLabel.TextXAlignment = Enum.TextXAlignment.Left
+    toggleLabel.Parent = toggle
+
+    local state = options.Default or false
+
+    local function updateToggleAppearance()
+        if state then
+            game:GetService("TweenService"):Create(toggleContainer, TweenInfo.new(0.2), {
+                BackgroundColor3 = ModernUI.Themes[self.Theme].Primary
+            }):Play()
+            game:GetService("TweenService"):Create(toggleButton, TweenInfo.new(0.2), {
+                Position = UDim2.new(1, -21, 0.5, 0)
+            }):Play()
+        else
+            game:GetService("TweenService"):Create(toggleContainer, TweenInfo.new(0.2), {
+                BackgroundColor3 = ModernUI.Themes[self.Theme].Hover
+            }):Play()
+            game:GetService("TweenService"):Create(toggleButton, TweenInfo.new(0.2), {
+                Position = UDim2.new(0, 3, 0.5, 0)
+            }):Play()
+        end
     end
-})
 
-local MyToggle = Tabs.Main:AddToggle({
-    Title = "Enable Feature",
-    Description = "Toggle this feature on/off",
-    Default = false
-})
+    updateToggleAppearance()
 
-MyToggle.OnChanged(function(value)
-    print("Toggle changed to:", value)
-end)
+    local clickArea = Instance.new("TextButton")
+    clickArea.Size = UDim2.new(1, 0, 1, 0)
+    clickArea.BackgroundTransparency = 1
+    clickArea.Text = ""
+    clickArea.Parent = toggle
 
-Tabs.Main:AddSlider({
-    Title = "Volume",
-    Description = "Adjust the volume level",
-    Min = 0,
-    Max = 100,
-    Default = 50,
-    Rounding = 1,
-    Callback = function(value)
-        print("Volume set to:", value)
+    local toggleObj = {
+        Value = state,
+        OnChanged = function(callback)
+            clickArea.MouseButton1Click:Connect(function()
+                state = not state
+                updateToggleAppearance()
+                if callback then
+                    callback(state)
+                end
+            end)
+        end,
+        SetValue = function(newValue)
+            state = newValue
+            updateToggleAppearance()
+        end
+    }
+
+    self.Options[toggleName] = toggleObj
+    table.insert(self.Elements, toggle)
+    return toggleObj
+end
+
+-- 🎨 Селектор тем
+function ModernUI:AddThemeSelector()
+    local selector = Instance.new("Frame")
+    selector.Size = UDim2.new(1, 0, 0, 80)
+    selector.BackgroundColor3 = ModernUI.Themes[self.Theme].Secondary
+    selector.BackgroundTransparency = self.Transparency
+    selector.BorderSizePixel = 0
+    selector.Parent = self.Content
+
+    local UICorner = Instance.new("UICorner")
+    UICorner.CornerRadius = UDim.new(0, 4)
+    UICorner.Parent = selector
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, -10, 0, 20)
+    title.Position = UDim2.new(0, 10, 0, 5)
+    title.BackgroundTransparency = 1
+    title.Text = "Select Theme"
+    title.TextColor3 = ModernUI.Themes[self.Theme].Text
+    title.TextSize = 14
+    title.Font = Enum.Font.GothamBold
+    title.TextXAlignment = Enum.TextXAlignment.Left
+    title.Parent = selector
+
+    local container = Instance.new("Frame")
+    container.Size = UDim2.new(1, -20, 0, 40)
+    container.Position = UDim2.new(0, 10, 0, 30)
+    container.BackgroundTransparency = 1
+    container.Parent = selector
+
+    local layout = Instance.new("UIListLayout")
+    layout.FillDirection = Enum.FillDirection.Horizontal
+    layout.Padding = UDim.new(0, 10)
+    layout.Parent = container
+
+    for _, themeName in ipairs({"Dark", "Light"}) do
+        local btn = Instance.new("TextButton")
+        btn.Size = UDim2.new(0, 100, 0, 30)
+        btn.BackgroundColor3 = ModernUI.Themes[themeName].Primary
+        btn.BackgroundTransparency = 0.2
+        btn.BorderSizePixel = 0
+        btn.Text = themeName
+        btn.TextColor3 = ModernUI.Themes[themeName].Text
+        btn.TextSize = 12
+        btn.Font = Enum.Font.Gotham
+        btn.Parent = container
+
+        local corner = Instance.new("UICorner")
+        corner.CornerRadius = UDim.new(0, 4)
+        corner.Parent = btn
+
+        btn.MouseButton1Click:Connect(function()
+            self.Theme = themeName
+            self.MainFrame.BackgroundColor3 = ModernUI.Themes[self.Theme].Background
+            title.TextColor3 = ModernUI.Themes[self.Theme].Text
+            btn.BackgroundTransparency = 0
+        end)
     end
-})
 
--- Переключение по RightControl
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-    if input.KeyCode == Enum.KeyCode.RightControl then
-        Window.ScreenGui.Enabled = not Window.ScreenGui.Enabled
-        game:GetService("UserInputService").MouseIconEnabled = not Window.ScreenGui.Enabled
-    end
-end)
+    return selector
+end
+
+return ModernUI
