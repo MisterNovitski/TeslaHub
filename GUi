@@ -1,4 +1,4 @@
--- ModernUI Library
+-- ModernUI Library (Local Version)
 local ModernUI = {}
 ModernUI.__index = ModernUI
 ModernUI.Version = "1.0.0"
@@ -747,7 +747,7 @@ function ModernUI:CreateWindow(options)
                 end
             end
         end
-    })
+    end)
     
     -- Сохраняем окно
     if not ModernUI.Windows then
@@ -764,4 +764,63 @@ function ModernUI:Notify(options)
     end
 end
 
-return ModernUI
+-- Теперь используем библиотеку
+local Window = ModernUI:CreateWindow({
+    Title = "ModernUI " .. ModernUI.Version,
+    SubTitle = "by Your Name",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.RightControl
+})
+
+-- Создание вкладок
+local MainTab = Window:AddTab({ Title = "Main", Icon = "home" })
+local SettingsTab = Window:AddTab({ Title = "Settings", Icon = "settings" })
+
+-- Уведомление
+ModernUI:Notify({
+    Title = "ModernUI",
+    Content = "The script has been loaded!",
+    Duration = 5
+})
+
+-- Элементы на главной вкладке
+MainTab:AddLabel({
+    Title = "Welcome to ModernUI",
+    Content = "This is a custom UI library inspired by Fluent"
+})
+
+MainTab:AddButton({
+    Title = "Test Button",
+    Description = "Click me to test",
+    Callback = function()
+        ModernUI:Notify({
+            Title = "Button Clicked!",
+            Content = "You clicked the test button",
+            Duration = 3
+        })
+    end
+})
+
+local MyToggle = MainTab:AddToggle({
+    Title = "Enable Feature",
+    Description = "Toggle this feature on/off",
+    Default = false
+})
+
+MyToggle.OnChanged(function(value)
+    print("Toggle changed to:", value)
+end)
+
+local MySlider = MainTab:AddSlider({
+    Title = "Volume",
+    Description = "Adjust the volume level",
+    Min = 0,
+    Max = 100,
+    Default = 50,
+    Rounding = 1,
+    Callback = function(value)
+        print("Volume set to:", value)
+    end
+})
